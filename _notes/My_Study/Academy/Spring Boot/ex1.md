@@ -1,0 +1,45 @@
+```java
+package com.sist.demo;
+
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+
+@RestController
+public class TestController {
+    // @Restcontroller = @controller+ @ResponseBody
+    // 난오로지 백엔드 쪽이야
+    // 타임리프 지원 리액트랑 연동을 하는 형태로 할 것이다.
+    // next 포트번호 3000 두서버 통신 비동기식 통신
+    //
+    @GetMapping("/test")
+    public String test() {
+        return "Hello world";
+    }
+
+    // public String varTest(@PathVariable ("var") String str) {
+    @GetMapping("/test2/{var}")
+    public String varTest(@PathVariable String var) {
+
+        return var;
+    }
+    // }
+
+    @GetMapping("/req1")
+    public String getReq(String name, String email) {
+        // 파라미터 받는 방법은 Spring 과 같다.
+        return name + "/" + email;
+    }
+
+    @GetMapping("/req2")
+    public String getReq2(@RequestParam String name, String email) {
+        // 파라미터 받는 방법은 Spring 과 같다.
+        return name + "/" + email;
+    }
+
+}
+
+```
+
+

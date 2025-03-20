@@ -1,0 +1,303 @@
+## 스레드를 직접 사용할 때의 문제점
+
+1. 스레드 생성 시간으로 인한 성능 문제
+2. 스레드 관리 문제
+3. Runnable 인터페이스의 불편함
+
+## 해결
+
+1번 2번 문제를 해결하려면 스레드를 생성하고 관리하는 풀(Pool)이 필요하다.
+
+- 스레드 풀에서 대기하며 쉰다 .
+- 이미 만들어진 스레드를 하나 조회한다.
+- 작업 완료 후스레드를 종료하는게 아니라, 다시 스레드 풀에 반납한다 이후에 다시 재사용 될 수 있다.
+
+이런 문제를 한방에 해결해주는 것이 자바가 제공하는 Executor 프레임 워크이다.
+
+
+## Excutor
+
+==멀티스레딩 및 병렬 처리를 쉽게 사용할 수 있도록 돕는 기능의 모음이다.== 
+==작업 실행의 관리 및 스레드 풀 관리를 효율적으로 처리해서 개발자가 직접 스레드를 생성하고 관리하는 복잡함을 줄여준다.==
+
+가장 단순한 작업 실행 인터페이스로 execute(Runnable command) 메서드 하나 가지고 있다.
+
+```java
+public interface Executor{
+	void execute(Runnable command);
+}
+```
+
+주요 메서드 submit(), close() 가 있다.
+
+```java
+public interface ExcutorService extends Excutor, AutoCloseable{
+	<T> Future<T> submit(Callable<T> task);
+
+	@Override
+	default void close(){...}
+	
+	...
+}
+```
+
+ExecutorService 인터페이스 대표적인 기본 구현체는 ThreadPoolExecutor이다. 
+
+## ThreadPoolExcutor 생성자
+
+- corePoolSize : 스레드 풀에서 관리되는 기본 스레드의 수
+- maximumPoolSize : 스레드 풀에서 관리되는 최대 스레드의 수
+- keepAliveTime, TimeUnit unit  : 기본 스레드 수를 초과해서 만들어진 스레드가 생존할 수 있는 대기 시간이다. (이 시간 동안 처리할 작업이 없다면 초과 스레드는 제거된다.)
+- BlockingQueue workQueue : 작업을 보관할 블로킹 큐
+
+## Runnable의 불편함
+
+- 반환 값이 없다. (스레드가 실행한 결과를 멤버변수에 넣어두고 join()등을 사용하여 값을 받는다.)
+- 예외처리 (체크예외 던질 수 없다)
+
+이런 문제를 해결하기 위해 Executor 프레임워크는 Callable과 Future라는 인터페이스를 도입했다.
+
+## Runnable과 Callable 비교
+
+### Runnable
+- Runnable의 run()은 반환 타입이 void 라서 값을 반환 X
+- 예외 선언 X (체크 예외를 던질 수 없다.)
+
+### Callable
+- java.util.concurrent 제공
+- Callable 의 call()은 반환타입이 제네릭 V이다. (값 반환 O)
+- throw Exception 예외 선언 (던질 수 있다.)
+
+1. ExecutorService 가 제공하는 submit()을 통해 Callable 작업으로 전달 
+2. MyCallable 인스턴스가 블로킹 큐에 전 달되고, 스레드 풀의 스레드중 하나가 작업 실행
+3. 결과를 직접 반환이 아니라, Future라는 인터페이스를 통해 
+	future.get()을 호출하면 MyCallable의 call()을 반환한 결과를 받을 수 있다.
+
+**Callable가 Runnable 보다 싱글 스레드를 호출하는 것처럼 편하다.**
+
+## future.get() 호출
+
+main 메서드에서 future.get()을 호출한다면 스레드풀의 스레드보다 main이 먼저 작업을 완료 해서 결과가 나오지 않을 꺼 같은 의구심이 든다.
+
+그리고 왜 불편하게 future를 반환해서 사용을 할까?
+
+## Future
+
+- 전달한 작업의 미래
+- submit() 을 호출하면 Future에 작업을 담고 블로킹 큐에 담긴다.(Future[task1])
+- Future의 구현체인 FutureTask는 Runable인터페이스도 함께 구현하고 있다.
+- 스레드 1은 FutureTask의 run() 메서드를 수행
+- run() 메서드가 taskA의 ㅊ미ㅣ() 메서드를 호출 그 결과를 받아서 처리
+
+## 블로킹 메서드
+
+- Thread.join(), Future.get() 과 같은 메서드는 스레드가 작업을 바로 수행X 다른 작업이 완료될때까지 기다리게 하는 메서드이다. 
+
+## future.cancel()
+
+- cancel(true) :  Future를 취소 상태로 변경, Thread.interrupt()호출해서 작업 중단
+- cancel(false) :  Future를 취소 상태로 변경, 이미 실행 중인 작업을 중단하지 않는다.
+
+> 취소할경우 두 경우, 결과 값을 받지 못한다.
+
+## Future 예외
+
+Future 에 발생한 예외를 담아둔다, 참고로 예외도 객체이다. 잡아서 필드에 보관할 수 있다.
+예외가 발생하면 Future 상태는 FAILED가 된다.
+
+- 상태가 FAILED면 ExecutionException 예외를 던진다.
+- ExecutionExeption 내부에 저장해둔 예외들이 포함되어있다면 e.getCause()를 호출하여 발생한 원본 예외를 받을 수 있다.
+
+> Future.get()은 작업의 결과 값을 받을 수도, 예외를 받을 수도 있다. Executor 프레임워크가 얼마나 잘 설계되어 있는지 알 수 있는 부분이다.
+
+## 작업 컬렉션 처리
+
+### invokeAll()
+
+- submit() 하지 않아도, future객체가 담긴 배열을 넣으면 모든 작업을 실행해준다.
+
+
+## 문제풀이
+
+### submit()
+```java
+package thread.executor.test;  
+  
+import java.util.concurrent.*;  
+  
+import static util.MyLogger.log;  
+import static util.ThreadUtils.sleep;  
+  
+public class OldOrderServiceTestMain {  
+    public static void main(String[] args) throws ExecutionException, InterruptedException {  
+        String orderNo = "Order#1234";  // 예시 주문 번호  
+        NewOrderService orderService = new NewOrderService();  
+        orderService.order(orderNo);  
+    }  
+  
+    static class NewOrderService {  
+        private final ExecutorService es = Executors.newFixedThreadPool(10);  
+  
+        public void order(String orderNo) throws ExecutionException,  
+                InterruptedException {  
+            NewOrderService.InventoryWork inventoryWork = new NewOrderService.InventoryWork(orderNo);  
+            NewOrderService.ShippingWork shippingWork = new NewOrderService.ShippingWork(orderNo);  
+            NewOrderService.AccountingWork accountingWork = new NewOrderService.AccountingWork(orderNo);  
+            try {  
+                // 작업들을 ExecutorService에 제출  
+                Future<Boolean> inventoryFuture = es.submit(inventoryWork);  
+                Future<Boolean> shippingFuture = es.submit(shippingWork);  
+                Future<Boolean> accountingFuture = es.submit(accountingWork);  
+                // 작업 완료를 기다림  
+                Boolean inventoryResult = inventoryFuture.get();  
+                Boolean shippingResult = shippingFuture.get();  
+                Boolean accountingResult = accountingFuture.get();  
+                // 결과 확인  
+                if (inventoryResult && shippingResult && accountingResult) {  
+                    log("모든 주문 처리가 성공적으로 완료되었습니다.");  
+                } else {  
+                    log("일부 작업이 실패했습니다.");  
+                }  
+            } finally {  
+                es.shutdown();  
+            }  
+        }  
+  
+        static class InventoryWork implements Callable<Boolean> {  
+            private final String orderNo;  
+  
+            public InventoryWork(String orderNo) {  
+                this.orderNo = orderNo;  
+            }  
+  
+            @Override  
+            public Boolean call() {  
+                log("재고 업데이트: " + orderNo);  
+                sleep(1000);  
+                return true;  
+            }  
+        }  
+  
+        static class ShippingWork implements Callable<Boolean> {  
+            private final String orderNo;  
+  
+            public ShippingWork(String orderNo) {  
+                this.orderNo = orderNo;  
+            }  
+  
+            @Override  
+            public Boolean call() {  
+                log("배송 시스템 알림: " + orderNo);  
+                sleep(1000);  
+                return true;  
+            }  
+        }  
+  
+        static class AccountingWork implements Callable<Boolean> {  
+            private final String orderNo;  
+  
+            public AccountingWork(String orderNo) {  
+                this.orderNo = orderNo;  
+            }  
+  
+            @Override  
+            public Boolean call() {  
+                log("회계 시스템 업데이트: " + orderNo);  
+                sleep(1000);  
+                return true;  
+            }  
+        }  
+    }  
+}
+```
+
+### invokeAll()
+```java
+package thread.executor.test;  
+  
+import java.util.List;  
+import java.util.concurrent.*;  
+  
+import static util.MyLogger.log;  
+import static util.ThreadUtils.sleep;  
+  
+public class NewOrderServiceTestMain {  
+    public static void main(String[] args) throws ExecutionException, InterruptedException {  
+        String orderNo = "Order#1234";  // 예시 주문 번호  
+        OldOrderService orderService = new OldOrderService();  
+        orderService.order(orderNo);  
+  
+    }  
+  
+    static class OldOrderService {  
+        public void order(String orderNumber) throws InterruptedException, ExecutionException {  
+            ExecutorService es = Executors.newFixedThreadPool(3);  
+            InventoryWork task1 = new InventoryWork(orderNumber);  
+            ShippingWork task2 = new ShippingWork(orderNumber);  
+            AccountingWork task3 = new AccountingWork(orderNumber);  
+            try {  
+                List<Callable<Boolean>> tasks = List.of(task1, task2, task3);  
+                List<Future<Boolean>> futureList = es.invokeAll(tasks);  
+  
+                Boolean allSuccess = true;  
+                for (Future<Boolean> value : futureList) {  
+                    if (!value.get()) allSuccess = false;  
+                    break;  
+                }  
+  
+                if (allSuccess) log("✅ 모든 작업이 성공했습니다!");  
+                else log("일부 작업이 실패했습니다.");  
+            }finally {  
+            es.shutdown();  
+            }  
+        }  
+  
+        static class InventoryWork implements Callable<Boolean> {  
+            private final String orderNo;  
+  
+            public InventoryWork(String orderNo) {  
+                this.orderNo = orderNo;  
+            }  
+  
+            @Override  
+            public Boolean call() {  
+                log("재고 업데이트: " + orderNo);  
+                sleep(1000);  
+                return true;  
+            }  
+        }  
+  
+        static class ShippingWork implements Callable<Boolean> {  
+            private final String orderNo;  
+  
+            public ShippingWork(String orderNo) {  
+                this.orderNo = orderNo;  
+            }  
+  
+            @Override  
+            public Boolean call() {  
+                log("배송 시스템 알림: " + orderNo);  
+                sleep(1000);  
+                return true;  
+            }  
+        }  
+  
+        static class AccountingWork implements Callable<Boolean> {  
+            private final String orderNo;  
+  
+            public AccountingWork(String orderNo) {  
+                this.orderNo = orderNo;  
+            }  
+  
+            @Override  
+            public Boolean call() {  
+                log("회계 시스템 업데이트: " + orderNo);  
+                sleep(1000);  
+                return true;  
+            }  
+        }  
+    }  
+}
+```
+
+

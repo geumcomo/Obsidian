@@ -1,0 +1,13 @@
+🐣 MyBatis란?
+
+MyBatis는 자바 개발자들이 데이터베이스를 쉽게 다룰 수 있도록 도와주는
+
+오픈 소스 ORM(Object-Relational Mapping) 프레임워크이다.
+
+🧐 MyBatis의 사용 목적
+
+MyBatis는 데이터베이스 쿼리 <-> 프로그래밍 언어 코드를 분리하여 유지보수성과 생산성을 높이는 것.
+
+  
+
+출처: [https://ccomccomhan.tistory.com/130](https://ccomccomhan.tistory.com/130) [[꼼꼼한 개발자] 꼼코더:티스토리]

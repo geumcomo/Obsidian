@@ -1,0 +1,13 @@
+```terminal
+npm install -g npm@latest
+최신 버전 확인
+
+npx create-next-app@latest
+프로젝트 생성
+
+npm install @mui/material @emotion/react @emotion/styled
+mui 설치
+
+npm i axios
+비동기식
+```

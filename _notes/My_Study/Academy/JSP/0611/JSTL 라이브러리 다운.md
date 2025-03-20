@@ -1,0 +1,9 @@
+https://tomcat.apache.org/taglibs/standard/
+
+![[Pasted image 20240611093135.png]]
+
+apache.org로 접속한 후 Apach project List항목에서 tomcat을 선택한다
+왼쪽 메뉴에서 [Taglibs]선택!
+그리고 [Download]를 선택한 후 나타나는 화면에서 위쪽에 [Apache Standard Taglib] 링크걸린 항목을 선택!
+[standard1.1항목의 [download]를 선택! 나타나는 화면에서 [binaries/]선택 후 아래쪽에서 6번째인 jakarta-taglibs-standard-1.1.1.zip
+파일의 다운로드 후 압축해제! lib폴더에 있는 2개의 jar파일을 {프로젝트폴더/../WEB-INF/lib에 붙여넣는다.

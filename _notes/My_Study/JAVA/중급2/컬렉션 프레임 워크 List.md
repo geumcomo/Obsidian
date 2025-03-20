@@ -1,0 +1,150 @@
+
+# 문제 1
+```java
+package collection.list.test.ex1;  
+  
+import java.util.ArrayList;  
+import java.util.List;  
+  
+public class ArrayEx1 {  
+    public static void main(String[] args) {  
+        List<Integer> students = new ArrayList<>();  
+        int score = 90;  
+        int total = 0;  
+        for (int i = 0; i < 5; i++) {  
+            students.add(i, score);  
+            total += score;  
+            score -= 10;  
+        }  
+        double average = (double) total / students.size();  
+        System.out.println("total = " + total);  
+        System.out.println("average = " + average);  
+    }  
+}
+```
+
+# 문제 2
+```java
+package collection.list.test.ex1;  
+  
+import java.util.ArrayList;  
+import java.util.List;  
+import java.util.Scanner;  
+  
+public class ListEx2 {  
+    public static void main(String[] args) {  
+        Scanner scanner = new Scanner(System.in);  
+        System.out.println("n개의 정수를 입력하세요.(종료 0)");  
+        List<Integer> list = new ArrayList<>();  
+        while (true) {  
+            int num = scanner.nextInt();  
+            if (num == 0)  
+                break;
+            list.add(num);  
+              
+        }  
+        System.out.println("출력");  
+        for (int i = 0; i < list.size(); i++) {  
+            System.out.print(list.get(i));  
+            if (i == list.size() - 1)  
+                return;  
+            System.out.print(",");  
+        }  
+    }  
+}
+```
+
+# 문제 3
+```java
+package collection.list.test.ex1;  
+  
+import java.util.ArrayList;  
+import java.util.List;  
+import java.util.Scanner;  
+  
+public class ListEx3 {  
+    public static void main(String[] args) {  
+        Scanner scanner = new Scanner(System.in);  
+        System.out.println("n개의 정수를 입력하세요(종료 0)");  
+        List<Integer> list = new ArrayList<>();  
+        while (true) {  
+            int input = scanner.nextInt();  
+            if (input == 0)  
+                break;  
+            list.add(input);  
+        }  
+        int total = 0;  
+        for (Integer num : list) {  
+            total += num;  
+        }  
+        double average = (double) total / list.size();  
+        System.out.println("total = " + total);  
+        System.out.println("average = " + average);  
+    }  
+}
+```
+
+# 문제 4
+
+```java
+package collection.list.test.ex1;  
+  
+public class Item {  
+    private String name;  
+    private int price, quantity;  
+  
+    public Item(String name, int price, int quantity) {  
+        this.name = name;  
+        this.price = price;  
+        this.quantity = quantity;  
+    }  
+  
+    public String getName() {  
+        return name;  
+    }  
+  
+    public int getTotalPrice() {  
+        return price * quantity;  
+    }  
+}
+```
+
+```java
+package collection.list.test.ex1;  
+  
+import java.util.ArrayList;  
+import java.util.List;  
+  
+public class ShoppingCart {  
+    List<Item> items = new ArrayList<>();  
+  
+    public void addItem(Item item) {  
+        items.add(item);  
+    }  
+  
+    public void displayItems() {  
+        System.out.println("장바구니 상품 출력");  
+        int sum = 0;  
+        for (Item item : items) {  
+            System.out.println("상품명:" + item.getName() + ", " + "합계:" + item.getTotalPrice());  
+            sum += item.getTotalPrice();  
+        }  
+        System.out.println("전체 가격 합:" + sum);  
+    }  
+}
+```
+
+```java
+package collection.list.test.ex1;  
+  
+public class ShoppingCartMain {  
+    public static void main(String[] args) {  
+        ShoppingCart cart = new ShoppingCart();  
+        Item item1 = new Item("마늘", 2000, 2);  
+        Item item2 = new Item("상추", 3000, 4);  
+        cart.addItem(item1);  
+        cart.addItem(item2);  
+        cart.displayItems();  
+    }  
+}
+```

@@ -1,0 +1,40 @@
+EL(Expression Language(표현언어)
+```jsp
+<h1>${param.v1}</h1>
+ <h1>${param.u_name}</h1>
+```
+name을 가져올수 있다.
+
+```jsp
+<%@ page language="java" contentType="text/html; charset=utf-8"
+    pageEncoding="utf-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Insert title here</title>
+</head>
+<body>
+<%
+// 요청시 한글처리
+request.setCharacterEncoding("utf-8");
+request.setAttribute("age",	"30");
+request.setAttribute("s1", "만세");
+
+%>
+<%--EL(Expression Language(표현언어)
+일반적으로 내장되어 있는 형태
+스코프가 중복될수있는데 스코프를 붙이지 않는다면 request를 우선적으로 찾는다.
+하지만 sessionScope라고 지정을 해주면 된다.
+request를 붙여야 빠르다.
+ --%>
+ <h1>${param.v1}</h1>
+ <h1>${param.u_name}</h1>
+ <h1>${requestScope.age}</h1>
+ <h1>세션 s1: ${sessionScope.s1}</h1>
+</body>
+</html>
+```
+
+![[Pasted image 20240611100138.png]]
+![[Pasted image 20240611104123.png]]

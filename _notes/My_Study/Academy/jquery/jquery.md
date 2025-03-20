@@ -1,0 +1,34 @@
+```html
+<script>
+			// $("#t1 thead input[type=checkbox]").click(function(){
+			
+			     $("#t1 thead input:checkbox").click(function(){
+			
+			        console.log("dadwa")
+			
+			    });
+			  //자식 선택 체크박스
+			  $("#t1 tbody td:nth-child(3)").find(":checkbox")
+			  
+			  //체크박스 부모인 th를 사용하고싶을때
+			  $("#t1 thead input:checkbox").click(function(){
+			
+			        //클릭한 checkbox의 상위요소인 th태그를 얻어내어
+			
+			        //그 th태그의 index값을 알아내자 여러가지
+			
+			        let p = $(this).parent(); //th태그
+
+        console.log(p.prop("tagName"));
+            //현재문서에서 폼안에 fieldset안에 output태그 검색 
+            let output = document.querySelector(
+                "form fieldset output"
+            );
+            
+        //0.10과 같은 값을 10으로 만들기 위해 100을 곱했다. 하지만
+            //소수점이 생기는 부분을 정수화 시키기위해 parseInt라는
+            // 내장함수 를 활용했다.
+            
+            output.innerText = parseInt(pp.value*100);
+</script>
+```

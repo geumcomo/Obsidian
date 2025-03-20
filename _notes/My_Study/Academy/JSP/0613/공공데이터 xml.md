@@ -1,0 +1,105 @@
+![[Pasted image 20240613113313.png]]
+인증키 삽입 후 미리보기
+https://apis.data.go.kr/B552584/EvCharger/getChargerInfo?serviceKey=j04BJITj7IitA7PSblWH85CqGilLG0%2B3t2iZJLHr0CAELhJX%2FkI3%2BrAjNvw%2FzhVomFvYNL3IzD52IuJ3BhuoAA%3D%3D&pageNo=1&numOfRows=1000&zcode=11
+
+![[Pasted image 20240613113358.png]]
+
+``` java
+package data.action;
+
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.input.SAXBuilder;
+
+import data.vo.ItemVO;
+
+public class IndexAction implements Action {
+
+	@Override
+	public String execute(HttpServletRequest request, HttpServletResponse response) {
+
+		// 요청할 경로를 변수에 저장한다.
+		String path = "https://apis.data.go.kr/B552584/EvCharger/getChargerInfo?serviceKey=j04BJITj7IitA7PSblWH85CqGilLG0%2B3t2iZJLHr0CAELhJX%2FkI3%2BrAjNvw%2FzhVomFvYNL3IzD52IuJ3BhuoAA%3D%3D&pageNo=1&numOfRows=10&zcode=11";
+		URL url = null;
+
+		try {
+			url = new URL(path);// 웹상의 경로를 객체화한 것
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setRequestProperty("Content-Type", "application/xml");// 헤더에
+			// 받을 자원이 어떤 자원인지? mimeType을 지정한다.
+			conn.connect();
+
+			// 이제 요청하여 받을 자원들을 처리할 JDOM객체들을 준비
+			SAXBuilder builder = new SAXBuilder();
+
+			// 문서객체 생성
+			Document doc = builder.build(conn.getInputStream());
+
+			// 생성된 문서객체로 부터 루트를 얻어내자
+			Element root = doc.getRootElement();
+			// 루트의 자식들 중 body를 얻어낸다.
+			Element body = root.getChild("body");
+			System.out.println(root.getName());
+			Element items = body.getChild("items");
+			Element totalCount = root.getChild("totalCount");
+			System.out.println(totalCount);
+			List<Element> p_list = items.getChildren("item");
+			if (p_list != null && p_list.size() > 0) {
+				ItemVO[] ar = new ItemVO[p_list.size()];
+				// 위의 배열이 지금은 비어있지만 아래의 반복문을 수행하면
+				// 채워지도록 해야 하고 이 배열이 request에 저장되어야 한다.
+				int i = 0;
+				for (Element e : p_list) {
+					// 이름 - personnal안에 있는 자식들 중
+					// 태그 이름이 "name"인 요소의 문자열 가져오기
+					String name = e.getChildText("statNm");
+					System.out.println("이름:" + name);
+
+					String addr = e.getChildText("addr");
+					System.out.println("주소:" + addr);
+
+					String chgerType = e.getChildText("chgerType");
+					System.out.println("주소:" + chgerType);
+
+					String lat = e.getChildText("lat");
+					System.out.println("주소:" + lat);
+					String lng = e.getChildText("lng");
+					System.out.println("주소:" + lng);
+					String useTime = e.getChildText("useTime");
+					System.out.println("주소:" + useTime);
+
+					ItemVO pvo = new ItemVO();
+					pvo.setStatNm(name);
+					pvo.setChgerType(chgerType);
+					pvo.setAddr(addr);
+					pvo.setLat(lat);
+					pvo.setLng(lng);
+
+					ar[i] = pvo;
+					i++;
+
+				} // for의 끝
+
+				request.setAttribute("ar", ar);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return "jsp/index.jsp";
+
+	}
+
+}
+
+```
+![[Pasted image 20240613113512.png]]
+
+

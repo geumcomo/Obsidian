@@ -1,0 +1,9 @@
+{
+	"nodes":[
+		{"id":"886c608d1cbccc31","type":"file","file":"2024-04-17/dept.xml.md","x":-400,"y":97,"width":400,"height":400},
+		{"id":"8c56c87c25ca051d","type":"file","file":"2024-04-17/config.xml.md","x":120,"y":97,"width":400,"height":400},
+		{"id":"fe42573f4751d9fb","type":"file","file":"2024-04-17/Main.java.md","x":20,"y":-503,"width":400,"height":400},
+		{"id":"0f989b83701babe4","x":-400,"y":-440,"width":400,"height":400,"type":"file","file":"2024-04-17/DeptVO.md"}
+	],
+	"edges":[]
+}

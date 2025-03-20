@@ -1,0 +1,13 @@
+{
+	"nodes":[
+		{"id":"4dd6e60cee99a0ab","type":"file","file":"2024-04-18/EmpVO/Main.java.md","x":-80,"y":-580,"width":400,"height":400},
+		{"id":"c21fcbc8773d0fe8","type":"file","file":"2024-04-18/EmpVO/emp.xml.md","x":-760,"y":120,"width":400,"height":400},
+		{"id":"56eb1f84bc075738","type":"file","file":"2024-04-18/EmpVO/EmpVO.md","x":-760,"y":-580,"width":400,"height":400},
+		{"id":"431b97e4f44d3d1e","type":"file","file":"2024-04-18/EmpVO/config.xml.md","x":-80,"y":140,"width":400,"height":400}
+	],
+	"edges":[
+		{"id":"a7f608e43e43473f","fromNode":"56eb1f84bc075738","fromSide":"bottom","toNode":"c21fcbc8773d0fe8","toSide":"top"},
+		{"id":"3d94e84a2195f388","fromNode":"c21fcbc8773d0fe8","fromSide":"right","toNode":"431b97e4f44d3d1e","toSide":"left"},
+		{"id":"f1adf75a2915b8fc","fromNode":"431b97e4f44d3d1e","fromSide":"top","toNode":"4dd6e60cee99a0ab","toSide":"bottom"}
+	]
+}
