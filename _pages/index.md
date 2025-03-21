@@ -1,7 +1,7 @@
 ---
 layout: page
-title: Home
-id: home
+title: Goldmo's garden
+id: Goldmo
 permalink: /
 ---
 
